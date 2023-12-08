@@ -7,6 +7,7 @@ import android.util.Log
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 
 
 class MainActivity : AppCompatActivity() {
@@ -15,6 +16,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var buttons : List<Button>
     private lateinit var solution : String
     private lateinit var solutionText : TextView
+    private lateinit var checkSolution : List<Char>
+    private lateinit var buttonBackspace : Button
+    private lateinit var buttonEnter : Button
+    private lateinit var winner : TextView
     private var slot = 0
     private var attempted : Int = 0
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -86,11 +91,6 @@ class MainActivity : AppCompatActivity() {
 
         // Set up the buttons with the common click listener
         buttons.forEach { setupButtonClickListener(it) }
-
-        //Reset on Start
-        resetViews()
-
-        var checkSolution = solution.toList()
         // Buttons
 
 
@@ -98,7 +98,7 @@ class MainActivity : AppCompatActivity() {
         val score :TextView = findViewById(R.id.score)
         var scoreInt = 0
 
-        val buttonBackspace : Button = findViewById(R.id.button_backspace)
+        buttonBackspace = findViewById(R.id.button_backspace)
         buttonBackspace.setOnClickListener(){
             if(valid(attempted, slot)) {
                 if (slot >= 0) {
@@ -113,7 +113,7 @@ class MainActivity : AppCompatActivity() {
             else
                 toast("YOU FAILED")
         }
-        val buttonEnter : Button = findViewById(R.id.button_enter)
+        buttonEnter = findViewById(R.id.button_enter)
         buttonEnter.setOnClickListener() {
 //            val mess : String = attempts[attempted][0].text.toString()
 //            toast(mess)
@@ -165,7 +165,8 @@ class MainActivity : AppCompatActivity() {
                     val youWon = won(win)
 
                     if(youWon) {
-                        toast("YOU WON!")
+                        winner.text = "YOU WON!"
+                        winner.visibility = android.view.View.VISIBLE
                         solutionText.visibility = android.view.View.VISIBLE
                         scoreInt += 5-attempted
                         score.text = (scoreInt*10).toString()
@@ -174,20 +175,29 @@ class MainActivity : AppCompatActivity() {
                         }
                         buttonEnter.isEnabled = false
                         buttonBackspace.isEnabled = false
+                        showResultDialog(true, scoreInt*10, solution)
                     }
-                    if (attempted < 4 && !youWon) {
+                    if (attempted < 5 && !youWon) {
                         attempted++
+//                        score.text = attempted.toString()
                         slot = 0
-                        madeVisible(attempted)
+
+                        if (attempted > 4) {
+                            winner.text = "YOU LOST!"
+                            winner.visibility = android.view.View.VISIBLE
+                            solutionText.visibility = android.view.View.VISIBLE
+                            showResultDialog(false, scoreInt*10, solution)
+                        }
+                        else
+                            madeVisible(attempted)
                     }
-                    if (attempted > 4 && !youWon)
-                        toast("YOU FAILED!")
+
                 } else {
                     val message = "Fill the slot first!"
                     toast(message)
                 }
             }else
-                 toast("YOU FAILED")
+                toast("YOU FAILED")
 
 
         }
@@ -196,12 +206,16 @@ class MainActivity : AppCompatActivity() {
         buttonReset.setOnClickListener(){
             resetViews()
 
-            attempted = 0
-            slot = 0
-            checkSolution = solution.toList()
-            buttonBackspace.isEnabled = true
-            buttonEnter.isEnabled = true
+
         }
+
+        //Reset on Start
+        winner = findViewById(R.id.winner)
+        resetViews()
+
+
+
+
 
     }
     private fun resetViews() {
@@ -250,10 +264,20 @@ class MainActivity : AppCompatActivity() {
             "Movie" ,
             "Clock")
 
+        attempted = 0
+        slot = 0
+
         solution = listOfSolutions.random().uppercase()
         solutionText = findViewById(R.id.solution)
         solutionText.text = solution
         solutionText.visibility = android.view.View.INVISIBLE
+
+        checkSolution = solution.toList()
+        buttonBackspace.isEnabled = true
+        buttonEnter.isEnabled = true
+        winner.visibility = android.view.View.INVISIBLE
+
+
     }
 
     private fun madeVisible(num : Int)
@@ -327,6 +351,23 @@ class MainActivity : AppCompatActivity() {
                 return false
         }
         return true
+    }
+
+    private fun showResultDialog(isWin: Boolean, finalScore: Int, solutionWord : String) {
+        val message = "Your score: $finalScore\nSolution: $solutionWord"
+
+        AlertDialog.Builder(this)
+            .setTitle(if (isWin) "Game Over - You Win" else "Game Over - You Lose")
+            .setMessage(message)
+            .setPositiveButton("OK") { dialog, _ ->
+                dialog.dismiss()
+            }
+            .setNegativeButton("Reset") { dialog, _ ->
+                resetViews()
+                dialog.dismiss()
+            }
+            .create()
+            .show()
     }
 
 

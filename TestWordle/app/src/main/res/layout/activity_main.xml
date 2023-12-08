@@ -14,12 +14,25 @@
         tools:layout_editor_absoluteY="1dp">
 
         <TextView
+            android:id="@+id/winner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="win"
+            android:textAlignment="center"
+            android:textSize="34sp"
+            android:visibility="invisible" />
+
+        <TextView
             android:id="@+id/solution"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="2"
+            android:layout_weight="1"
+            android:gravity="center"
             android:text="TextView"
-            android:textAlignment="center" />
+            android:textAlignment="center"
+            android:textSize="34sp" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -770,7 +783,8 @@
                     android:background="@drawable/button_untested"
                     android:padding="1dp"
                     android:text="bs"
-                    android:textColor="@color/white" />
+                    android:textColor="@color/white"
+                    app:icon="@drawable/backspace" />
 
             </LinearLayout>
         </LinearLayout>
