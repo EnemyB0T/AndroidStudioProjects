@@ -214,9 +214,6 @@ class MainActivity : AppCompatActivity() {
         resetViews()
 
 
-
-
-
     }
     private fun resetViews() {
         // Reset each letter button's background
